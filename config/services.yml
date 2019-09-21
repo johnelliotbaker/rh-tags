@@ -10,6 +10,7 @@ services:
             - '@template'
             - '@auth'
             - '@robertheim.topictags.tagcloud_manager'
+            - '@dispatcher'
         tags:
             - { name: event.listener }
     robertheim.topictags.acp_listener:

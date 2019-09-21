@@ -61,6 +61,9 @@ class main_listener implements EventSubscriberInterface
 	/** @var \robertheim\topictags\service\tagcloud_manager */
 	protected $tagcloud_manager;
 
+	/** @var \phpbb\event\dispatcher */
+	protected $phpbb_dispatcher;
+
 	/**
 	 * Constructor
 	 */
@@ -72,7 +75,8 @@ class main_listener implements EventSubscriberInterface
 							\phpbb\user $user,
 							\phpbb\template\template $template,
 							\phpbb\auth\auth $auth,
-							\robertheim\topictags\service\tagcloud_manager $tagcloud_manager
+							\robertheim\topictags\service\tagcloud_manager $tagcloud_manager,
+                            \phpbb\event\dispatcher $phpbb_dispatcher
 	)
 	{
 		$this->config = $config;
@@ -83,6 +87,7 @@ class main_listener implements EventSubscriberInterface
 		$this->template = $template;
 		$this->auth = $auth;
 		$this->tagcloud_manager = $tagcloud_manager;
+		$this->phpbb_dispatcher = $phpbb_dispatcher;
 	}
 
 	/**
@@ -147,7 +152,11 @@ class main_listener implements EventSubscriberInterface
 	 */
 	public function modify_posting_parameters($event)
 	{
-		if ($this->auth->acl_gets(permissions::USE_TAGS, permissions::ADMIN_EDIT_TAGS, permissions::MOD_EDIT_TAGS))
+		// if ($this->auth->acl_gets(permissions::USE_TAGS, permissions::ADMIN_EDIT_TAGS, permissions::MOD_EDIT_TAGS))
+        $permission = false;
+        $vars = ['permission'];
+        extract($this->phpbb_dispatcher->trigger_event('robertheim.topictags.modify_groupset_permission', compact($vars)));
+		if ($permission)
 		{
 
 			$data = $event->get_data();
@@ -173,7 +182,11 @@ class main_listener implements EventSubscriberInterface
 	 */
 	public function submit_post_end($event)
 	{
-		if ($this->auth->acl_gets(permissions::USE_TAGS, permissions::ADMIN_EDIT_TAGS, permissions::MOD_EDIT_TAGS))
+		// if ($this->auth->acl_gets(permissions::USE_TAGS, permissions::ADMIN_EDIT_TAGS, permissions::MOD_EDIT_TAGS))
+        $permission = false;
+        $vars = ['permission'];
+        extract($this->phpbb_dispatcher->trigger_event('robertheim.topictags.modify_groupset_permission', compact($vars)));
+		if ($permission)
 		{
 			$event_data = $event->get_data();
 			$data = $event_data['data'];
@@ -197,7 +210,11 @@ class main_listener implements EventSubscriberInterface
 	 */
 	public function posting_modify_template_vars($event)
 	{
-		if ($this->auth->acl_gets(permissions::USE_TAGS, permissions::ADMIN_EDIT_TAGS, permissions::MOD_EDIT_TAGS))
+		// if ($this->auth->acl_gets(permissions::USE_TAGS, permissions::ADMIN_EDIT_TAGS, permissions::MOD_EDIT_TAGS))
+        $permission = false;
+        $vars = ['permission'];
+        extract($this->phpbb_dispatcher->trigger_event('robertheim.topictags.modify_groupset_permission', compact($vars)));
+		if ($permission)
 		{
 			$data = $event->get_data();
 			$forum_id = $data['forum_id'];
@@ -298,6 +315,7 @@ class main_listener implements EventSubscriberInterface
 		{
 			$page_data['S_RH_TOPICTAGS_WHITELIST_ENABLED'] = true;
 			$tags = $this->tags_manager->get_whitelist_tags();
+            // sort($tags);
 			for ($i = 0, $size = sizeof($tags); $i < $size; $i++)
 			{
 				$this->template->assign_block_vars('rh_topictags_whitelist', array(

@@ -314,7 +314,13 @@ class main_listener implements EventSubscriberInterface
 		if ($this->config[prefixes::CONFIG . '_whitelist_enabled'])
 		{
 			$page_data['S_RH_TOPICTAGS_WHITELIST_ENABLED'] = true;
-			$tags = $this->tags_manager->get_whitelist_tags();
+            ///////////// DOCMOD ////////////////
+            $tags = [];
+            $vars = ['tags'];
+            extract($this->phpbb_dispatcher->trigger_event('robertheim.topictags.get_tags_whitelist_before', compact($vars)));
+            /////////////////////////////////////
+            // $tags = $this->tags_manager->get_whitelist_tags();
+            /////////////////////////////////////
             // sort($tags);
 			for ($i = 0, $size = sizeof($tags); $i < $size; $i++)
 			{

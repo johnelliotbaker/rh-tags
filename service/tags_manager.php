@@ -431,7 +431,11 @@ class tags_manager
 	public function get_topics_by_tags(array $tags, $start, $limit, $mode = 'AND', $casesensitive = false)
 	{
 		$sql = $this->get_topics_build_query($tags, $mode, $casesensitive);
-		$order_by = ' ORDER BY topics.topic_last_post_time DESC';
+        ///////////// DOCMOD ////////////////
+        $order_by = ' ORDER BY topics.topic_id DESC';
+        /////////////////////////////////////
+        // $order_by = ' ORDER BY topics.topic_last_post_time DESC';
+        /////////////////////////////////////
 		$sql .= $order_by;
 		return $this->db_helper->get_array($sql, $limit, $start);
 	}
